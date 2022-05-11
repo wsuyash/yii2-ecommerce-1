@@ -147,7 +147,7 @@ class Product extends \yii\db\ActiveRecord
 		$transaction = Yii::$app->db->beginTransaction();
 		$ok = parent::save($runValidation, $attributeNames);
 
-		if ($ok) {
+		if ($ok && $this->imageFile) {
 			$fullpath = Yii::getAlias('@frontend/web/storage' . $this->image);
 			$dir = dirname($fullpath);
 
@@ -155,10 +155,9 @@ class Product extends \yii\db\ActiveRecord
 				$transaction->rollBack();
 				return false;
 			}
-
-			$transaction->commit();
 		}
 
+		$transaction->commit();
 		return $ok;
 	}
 

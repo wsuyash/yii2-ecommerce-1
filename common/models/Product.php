@@ -3,6 +3,10 @@
 namespace common\models;
 
 use Yii;
+use yii\base\Security;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "{{%products}}".
@@ -25,96 +29,141 @@ use Yii;
  */
 class Product extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return '{{%products}}';
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function rules()
-    {
-        return [
-            [['name', 'price', 'status'], 'required'],
-            [['description'], 'string'],
-            [['price'], 'number'],
-            [['status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
-            [['name'], 'string', 'max' => 255],
-            [['image'], 'string', 'max' => 2000],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updated_by' => 'id']],
-        ];
-    }
+	/**
+	 * @var \yii\web\UploadedFile
+	 */
+	public $imageFile;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'name' => 'Name',
-            'description' => 'Description',
-            'image' => 'Product Image',
-            'price' => 'Price',
-            'status' => 'Published',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'created_by' => 'Created By',
-            'updated_by' => 'Updated By',
-        ];
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function tableName()
+	{
+		return '{{%products}}';
+	}
 
-    /**
-     * Gets query for [[CartItems]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\CartItemsQuery
-     */
-    public function getCartItems()
-    {
-        return $this->hasMany(CartItems::className(), ['product_id' => 'id']);
-    }
+	public function behaviors()
+	{
+		return [
+			TimestampBehavior::class,
+			BlameableBehavior::class
+		];
+	}
 
-    /**
-     * Gets query for [[CreatedBy]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
-     */
-    public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rules()
+	{
+		return [
+			[['name', 'price', 'status'], 'required'],
+			[['description'], 'string'],
+			[['price'], 'number'],
+			[['imageFile'], 'image', 'maxSize' => 10 * 1024 * 1024],
+			[['status', 'created_at', 'updated_at', 'created_by', 'updated_by'], 'integer'],
+			[['name'], 'string', 'max' => 255],
+			[['image'], 'string', 'max' => 2000],
+			[['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
+			[['updated_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['updated_by' => 'id']],
+		];
+	}
 
-    /**
-     * Gets query for [[OrderItems]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemsQuery
-     */
-    public function getOrderItems()
-    {
-        return $this->hasMany(OrderItems::className(), ['product_id' => 'id']);
-    }
+	/**
+	 * {@inheritdoc}
+	 */
+	public function attributeLabels()
+	{
+		return [
+			'id' => 'ID',
+			'name' => 'Name',
+			'description' => 'Description',
+			'image' => 'Product Image',
+			'imageFile' => 'Product Image',
+			'price' => 'Price',
+			'status' => 'Published',
+			'created_at' => 'Created At',
+			'updated_at' => 'Updated At',
+			'created_by' => 'Created By',
+			'updated_by' => 'Updated By',
+		];
+	}
 
-    /**
-     * Gets query for [[UpdatedBy]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
-     */
-    public function getUpdatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'updated_by']);
-    }
+	/**
+	 * Gets query for [[CartItems]].
+	 *
+	 * @return \yii\db\ActiveQuery|\common\models\query\CartItemsQuery
+	 */
+	public function getCartItems()
+	{
+		return $this->hasMany(CartItems::className(), ['product_id' => 'id']);
+	}
 
-    /**
-     * {@inheritdoc}
-     * @return \common\models\query\ProductQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new \common\models\query\ProductQuery(get_called_class());
-    }
+	/**
+	 * Gets query for [[CreatedBy]].
+	 *
+	 * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
+	 */
+	public function getCreatedBy()
+	{
+		return $this->hasOne(User::className(), ['id' => 'created_by']);
+	}
+
+	/**
+	 * Gets query for [[OrderItems]].
+	 *
+	 * @return \yii\db\ActiveQuery|\common\models\query\OrderItemsQuery
+	 */
+	public function getOrderItems()
+	{
+		return $this->hasMany(OrderItems::className(), ['product_id' => 'id']);
+	}
+
+	/**
+	 * Gets query for [[UpdatedBy]].
+	 *
+	 * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
+	 */
+	public function getUpdatedBy()
+	{
+		return $this->hasOne(User::className(), ['id' => 'updated_by']);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 * @return \common\models\query\ProductQuery the active query used by this AR class.
+	 */
+	public static function find()
+	{
+		return new \common\models\query\ProductQuery(get_called_class());
+	}
+
+	public function save($runValidation = true, $attributeNames = null)
+	{
+		if ($this->imageFile) {
+			$this->image = '/products/' . Yii::$app->security->generateRandomString() . '/' . $this->imageFile->name;
+		}
+
+		$transaction = Yii::$app->db->beginTransaction();
+		$ok = parent::save($runValidation, $attributeNames);
+
+		if ($ok) {
+			$fullpath = Yii::getAlias('@frontend/web/storage' . $this->image);
+			$dir = dirname($fullpath);
+
+			if (!FileHelper::createDirectory($dir) | !$this->imageFile->saveAs($fullpath)) {
+				$transaction->rollBack();
+				return false;
+			}
+
+			$transaction->commit();
+		}
+
+		return $ok;
+	}
+
+	public function getImageUrl()
+	{
+		return Yii::$app->params['frontendUrl'] . '/storage' . $this->image;
+	}
 }

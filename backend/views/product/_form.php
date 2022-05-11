@@ -11,7 +11,9 @@ use dosamigos\ckeditor\CKEditor;
 
 <div class="product-form">
 
-	<?php $form = ActiveForm::begin(); ?>
+	<?php $form = ActiveForm::begin([
+		'options' => ['enctype' => 'multipart/form-data']
+	]); ?>
 
 	<?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -20,14 +22,7 @@ use dosamigos\ckeditor\CKEditor;
 		'preset' => 'basic'
 	]) ?>
 
-	<!--	<div class="input-group mb-3">-->
-	<!--		<div class="custom-file">-->
-	<!--			<input type="file" class="custom-file-input" id="inputGroupFile01">-->
-	<!--			<label class="custom-file-label" for="inputGroupFile01">Choose image for product</label>-->
-	<!--		</div>-->
-	<!--	</div>-->
-
-	<?= $form->field($model, 'image', [
+	<?= $form->field($model, 'imageFile', [
 		'template' => '
 			<div class="custom-file">
 				{input}	

@@ -9,19 +9,17 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
-use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
-use frontend\models\ContactForm;
 
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends \frontend\base\Controller
 {
 	/**
 	 * {@inheritdoc}
@@ -121,7 +119,7 @@ class SiteController extends Controller
 	}
 
 	/**
-	/**
+	 * /**
 	 * Signs user up.
 	 *
 	 * @return mixed
@@ -231,4 +229,5 @@ class SiteController extends Controller
 			'model' => $model
 		]);
 	}
+
 }

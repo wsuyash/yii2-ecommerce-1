@@ -8,12 +8,23 @@ class Controller extends \yii\web\Controller
 {
 	public function beforeAction($action)
 	{
+		if (\Yii::$app->user->isGuest) {
+			$cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+			$sum = 0;
 
-		$this->view->params['cartItemCount'] = CartItem::findBySql("
-			SELECT SUM(quantity) FROM cart_items WHERE created_by = :userId" , [
-				'userId' => \Yii::$app->user->id
-			]
-		)->scalar();
+			foreach ($cartItems as $cartItem) {
+				$sum += $cartItem['quantity'];
+			}
+		} else {
+			$sum = CartItem::findBySql(
+				"SELECT SUM(quantity) FROM cart_items WHERE created_by = :userId", [
+					'userId' => \Yii::$app->user->getId()
+				]
+			)->scalar();
+		}
+
+		$this->view->params['cartItemCount'] = $sum;
+
 		return parent::beforeAction($action);
 	}
 }

@@ -17,66 +17,66 @@ use Yii;
  */
 class CartItem extends \yii\db\ActiveRecord
 {
-    /**
-     * {@inheritdoc}
-     */
-    public static function tableName()
-    {
-        return '{{%cart_items}}';
-    }
+	const SESSION_KEY = 'CART_ITEMS';
+		/**
+		 * {@inheritdoc}
+		 */
+		public static function tableName() {
+		return '{{%cart_items}}';
+	}
 
     /**
-     * {@inheritdoc}
-     */
+		 * {@inheritdoc}
+		 */
     public function rules()
-    {
-        return [
-            [['product_id', 'quantity'], 'required'],
-            [['product_id', 'quantity', 'created_by'], 'integer'],
-            [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
-            [['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
-        ];
-    }
+		{
+			return [
+				[['product_id', 'quantity'], 'required'],
+				[['product_id', 'quantity', 'created_by'], 'integer'],
+				[['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
+				[['product_id'], 'exist', 'skipOnError' => true, 'targetClass' => Product::className(), 'targetAttribute' => ['product_id' => 'id']],
+			];
+		}
 
     /**
-     * {@inheritdoc}
-     */
+		 * {@inheritdoc}
+		 */
     public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'product_id' => 'Product ID',
-            'quantity' => 'Quantity',
-            'created_by' => 'Created By',
-        ];
-    }
+		{
+			return [
+				'id' => 'ID',
+				'product_id' => 'Product ID',
+				'quantity' => 'Quantity',
+				'created_by' => 'Created By',
+			];
+		}
 
     /**
-     * Gets query for [[CreatedBy]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
-     */
+		 * Gets query for [[CreatedBy]].
+		 *
+		 * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
+		 */
     public function getCreatedBy()
-    {
-        return $this->hasOne(User::className(), ['id' => 'created_by']);
-    }
+		{
+			return $this->hasOne(User::className(), ['id' => 'created_by']);
+		}
 
     /**
-     * Gets query for [[Product]].
-     *
-     * @return \yii\db\ActiveQuery|\common\models\query\ProductQuery
-     */
+		 * Gets query for [[Product]].
+		 *
+		 * @return \yii\db\ActiveQuery|\common\models\query\ProductQuery
+		 */
     public function getProduct()
-    {
-        return $this->hasOne(Product::className(), ['id' => 'product_id']);
-    }
+		{
+			return $this->hasOne(Product::className(), ['id' => 'product_id']);
+		}
 
     /**
-     * {@inheritdoc}
-     * @return \common\models\query\CartItemQuery the active query used by this AR class.
-     */
+		 * {@inheritdoc}
+		 * @return \common\models\query\CartItemQuery the active query used by this AR class.
+		 */
     public static function find()
-    {
-        return new \common\models\query\CartItemQuery(get_called_class());
-    }
+		{
+			return new \common\models\query\CartItemQuery(get_called_class());
+		}
 }

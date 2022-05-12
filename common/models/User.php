@@ -242,7 +242,7 @@ class User extends ActiveRecord implements IdentityInterface
 	 */
 	public function getAddress()
 	{
-		$address = $this->addresses[0] ?: new UserAddress();
+		$address = $this->addresses[0] ?? new UserAddress();
 		$address->user_id = $this->id;
 
 		return $address;

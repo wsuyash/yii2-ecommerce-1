@@ -18,15 +18,17 @@ class CartController extends \frontend\base\Controller
 	public function behaviors()
 	{
 		return [
-			'class' => ContentNegotiator::class,
-			'only' => ['add'],
-			'formats' => [
-				'application/json' => Response::FORMAT_JSON,
+			[
+				'class' => ContentNegotiator::class,
+				'only' => ['add'],
+				'formats' => [
+					'application/json' => Response::FORMAT_JSON
+				],
 			],
 			[
 				'class' => VerbFilter::class,
 				'actions' => [
-					'delete' => ['POST', 'DELETE']
+					'delete' => ['POST', 'DELETE'],
 				]
 			]
 		];

@@ -72,21 +72,26 @@ class CartItem extends \yii\db\ActiveRecord
 
 	public static function getItemsForUser($currUserId)
 	{
-		return CartItem::findBySql(
-			"SELECT 
-				  c.product_id as id,
-				  p.image,
-				  p.name,
-				  p.price,
-				  c.quantity,
-				  p.price * c.quantity as total_price
-				FROM cart_items c
-				  LEFT JOIN products p on p.id = c.product_id
-				WHERE c.created_by = :userId",
-			[
-				'userId', $currUserId
-			]
-		)->asArray()->all();
+		if (\Yii::$app->user->isGuest) {
+			$cartItems = \Yii::$app->session->get(CartItem::SESSION_KEY, []);
+		} else {
+			$cartItems = CartItem::findBySql(
+				"SELECT
+             		c.product_id as id,
+             		p.image,
+             		p.name,
+             		p.price,
+             		c.quantity,
+             		p.price * c.quantity as total_price
+                FROM cart_items c
+                LEFT JOIN products p on p.id = c.product_id
+                WHERE c.created_by = :userId",
+				['userId' => $currUserId])
+				->asArray()
+				->all();
+		}
+
+		return $cartItems;
 	}
 
 	/**
@@ -118,7 +123,7 @@ class CartItem extends \yii\db\ActiveRecord
 	/**
 	 * Gets query for [[CreatedBy]].
 	 *
-	 * @return \yii\db\ActiveQuery|\common\models\query\UserQuery
+	 * @return \yii\db\ActiveQuery|\common\models\query\UserAddressQuery
 	 */
 	public function getCreatedBy()
 	{

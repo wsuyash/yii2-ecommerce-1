@@ -4,10 +4,12 @@
 /** @var array $cartItems */
 /** @var int $productQuantity */
 /** @var float $totalPrice */
+
+use yii\widgets\ActiveForm;
 ?>
 
 <?php $form = ActiveForm::begin([
-	'action' => [''],
+	'action' => ['/cart/checkout'],
 ]); ?>
 <div class="row">
 	<div class="col">
